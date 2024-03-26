@@ -119,4 +119,58 @@ function startApp() {
   renderProducts();
 }
 
+/////// CHARTS ///////////////
+
+function renderChart() {
+  let productNames = [];
+  let productVotes = [];
+  let productViews = [];
+
+  for (let i = 0; i < Product.allProducts.length; i++) {
+    let currentProduct = Product.allProducts[i];
+    productNames.push(currentProduct.name);
+    productVotes.push(currentProduct.clicks);
+    productViews.push(currentProduct.views);
+  }
+
+  // refer to Chart.js
+  // https://www.chartjs.org/docs/latest/charts/bar.html
+  const data = {
+    labels: productNames,
+    datasets: [
+      {
+        label: 'Votes',
+        data: productVotes,
+        backgroundColor: ['rgba(255, 128, 114, 0.2)'],
+        borderColor: ['rgb(255, 128, 114)'],
+        borderWidth: 1,
+      },
+      {
+        label: 'Views',
+        data: productViews,
+        backgroundColor: ['rgba(97, 113, 128, 0.2)'],
+        borderColor: ['rgb(97, 113, 128)'],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+        },
+      },
+    },
+  };
+  const canvasChart = document.getElementById('myChart');
+  new Chart(canvasChart, config);
+}
+
 startApp();
