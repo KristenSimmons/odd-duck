@@ -1,16 +1,17 @@
 'use strict';
 
-const productNames = ['boots', 'bathroom', 'breakfast', 'bubblegum', 'chair', 'dog-duck', 'tauntaun', 'scissors', 'water-can', 'wine-glass', 'bag', 'banana', 'cthulhu', 'dragon', 'pen', 'pet-sweep', 'shark', 'sweep', 'unicorn'];
-
 const leftImg = document.getElementById('img1');
 const middleImg = document.getElementById('img2');
 const rightImg = document.getElementById('img3');
 const showResultsButton = document.getElementById('showResults');
 const showResultsSection = document.getElementById('results');
 
+const productNames = ['boots', 'bathroom', 'breakfast', 'bubblegum', 'chair', 'dog-duck', 'tauntaun', 'scissors', 'water-can', 'wine-glass', 'bag', 'banana', 'cthulhu', 'dragon', 'pen', 'pet-sweep', 'shark', 'sweep', 'unicorn'];
+
 let leftProduct = null;
 let middleProduct = null;
 let rightProduct = null;
+let voteCount = 0;
 const maxRounds = 25;
 let currentRound = 0;
 
@@ -22,7 +23,7 @@ function Product(name, src) {
 }
 
 Product.allProducts = [];
-Product.workingProducts = []; 
+Product.workingProducts = [];
 
 
 function initProducts() {
@@ -57,32 +58,64 @@ function renderProducts() {
   rightImg.setAttribute('src', rightProduct.src);
 }
 
+function handleLeftProductClick() {
+  leftProduct.votes += 1;
+  voteCount += 1;
+  renderProducts();
+}
+
+function handleMiddleProductClick() {
+  middleProduct.votes += 1;
+  voteCount += 1;
+  renderProducts();
+}
+
+function handleRightProductClick() {
+  rightProduct.votes += 1;
+  voteCount += 1;
+  renderProducts();
+}
+
+function handleShowResultsClick() {
+  renderChart();
+  removeResultsListener();
+}
+
+function initEventListeners() {
+  leftImg.addEventListener('click', handleLeftProductClick);
+  middleImg.addEventListener('click', handleMiddleProductClick);
+  rightImg.addEventListener('click', handleRightProductClick);
+}
+
 function endVoting() {
   leftImg.removeEventListener('click', handleLeftProductClick);
   middleImg.removeEventListener('click', handleMiddleProductClick);
   rightImg.removeEventListener('click', handleRightProductClick);
-
   showResultsButton.hidden = false;
   showResultsButton.addEventListener('click', handleShowResultsClick);
+  const resultsHeaderElem = document.createElement('h2');
+  //showResultsSection.appendChild(resultsHeaderElem);
+  resultsHeaderElem.textContent = 'Results';
+  //saveProductResults();
 }
 
-function handleShowResultsClick() {
-  renderResults();
+function removeResultsListener() {
+  showResultsButton.removeEventListener('click', handleShowResultsClick);
 }
 
-function renderResults() {
+// function renderResults() {
 
-  const ul = document.createElement('ul');
-  showResultsSection.appendChild(ul);
+//   const ul = document.createElement('ul');
+//   showResultsSection.appendChild(ul);
 
-  for (let i = 0; i < Product.allProducts.length; i++) {
-    const productInstance = Product.allProducts[i];
-    const result = `The product ${productInstance.name} received ${productInstance.votes} votes and was viewed ${productInstance.views} times.`;
-    const li = document.createElement('li');
-    ul.appendChild(li);
-    li.textContent = result;
-  }
-}
+//   for (let i = 0; i < Product.allProducts.length; i++) {
+//     const productInstance = Product.allProducts[i];
+//     const result = `The product ${productInstance.name} received ${productInstance.votes} votes and was viewed ${productInstance.views} times.`;
+//     const li = document.createElement('li');
+//     ul.appendChild(li);
+//     li.textContent = result;
+//   }
+// }
 
 // Fisher Yates via Chat GPT
 function shuffleArray(array) {
@@ -92,26 +125,6 @@ function shuffleArray(array) {
   }
 }
 
-function initEventListeners() {
-  leftImg.addEventListener('click', handleLeftProductClick);
-  middleImg.addEventListener('click', handleMiddleProductClick);
-  rightImg.addEventListener('click', handleRightProductClick);
-}
-
-function handleLeftProductClick() {
-  leftProduct.votes += 1;
-  renderProducts();
-}
-
-function handleMiddleProductClick() {
-  middleProduct.votes += 1;
-  renderProducts();
-}
-
-function handleRightProductClick() {
-  rightProduct.votes += 1;
-  renderProducts();
-}
 
 function startApp() {
   initProducts();
@@ -174,3 +187,4 @@ function renderChart() {
 }
 
 startApp();
+
