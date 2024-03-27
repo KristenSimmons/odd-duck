@@ -142,7 +142,7 @@ function renderChart() {
   for (let i = 0; i < Product.allProducts.length; i++) {
     let currentProduct = Product.allProducts[i];
     productNames.push(currentProduct.name);
-    productVotes.push(currentProduct.clicks);
+    productVotes.push(currentProduct.votes);
     productViews.push(currentProduct.views);
   }
 
@@ -174,10 +174,11 @@ function renderChart() {
     options: {
       scales: {
         x: {
-          stacked: true,
+          stacked: false,
         },
         y: {
-          stacked: true,
+          stacked: false,
+          beginAtZero: true,
         },
       },
     },
@@ -187,4 +188,3 @@ function renderChart() {
 }
 
 startApp();
-
