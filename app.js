@@ -12,6 +12,7 @@ let middleProduct = null;
 let rightProduct = null;
 const maxRounds = 25;
 let currentRound = 0;
+const productStorageKey = 'product-key';
 
 function Product(name, src) {
   this.name = name;
@@ -90,12 +91,46 @@ function endVoting() {
   showResultsButton.addEventListener('click', handleShowResultsClick);
   const resultsHeaderElem = document.createElement('h2');
   resultsHeaderElem.textContent = 'Results';
+  saveProductResults();
 }
 
 function removeResultsListener() {
   showResultsButton.removeEventListener('click', handleShowResultsClick);
 }
 
+function saveProductResults() {
+  const productStorageText = JSON.stringify(Product.allProducts);
+  localStorage.setItem(productStorageKey, productStorageText);
+}
+
+function parseStoredProducts(storageText) {
+  // restore from storage
+  const storedProductObjects = JSON.parse(storageText);
+
+  Product.allProducts.length = 0; // fail safe to reset products array to 0
+
+  for (let productObject of storedProductObjects) {
+    // console.log(productObject.views);
+    const currentProduct = new Product(
+      productObject.name,
+      productObject.src,
+      productObject.views,
+      productObject.clicks
+    );
+    Product.allProducts.push(currentProduct);
+  }
+  console.log(Product.allProducts);
+}
+
+function loadProducts() {
+  const productStorageText = localStorage.getItem(productStorageKey); // access stored product results data stored in the saveProductResults() function
+  console.log(productStorageText);
+  if (productStorageText) {
+    parseStoredProducts(productStorageText); // if there is stored results data, access it and parse it, if not, initiate products creation
+  } else {
+    initProducts();
+  }
+}
 
 // Fisher Yates via Chat GPT
 function shuffleArray(array) {
