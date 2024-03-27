@@ -4,16 +4,15 @@ const leftImg = document.getElementById('img1');
 const middleImg = document.getElementById('img2');
 const rightImg = document.getElementById('img3');
 const showResultsButton = document.getElementById('showResults');
-const showResultsSection = document.getElementById('results');
 
 const productNames = ['boots', 'bathroom', 'breakfast', 'bubblegum', 'chair', 'dog-duck', 'tauntaun', 'scissors', 'water-can', 'wine-glass', 'bag', 'banana', 'cthulhu', 'dragon', 'pen', 'pet-sweep', 'shark', 'sweep', 'unicorn'];
 
 let leftProduct = null;
 let middleProduct = null;
 let rightProduct = null;
-let voteCount = 0;
 const maxRounds = 25;
 let currentRound = 0;
+const productStorageKey = 'product-key';
 
 function Product(name, src) {
   this.name = name;
@@ -60,19 +59,16 @@ function renderProducts() {
 
 function handleLeftProductClick() {
   leftProduct.votes += 1;
-  voteCount += 1;
   renderProducts();
 }
 
 function handleMiddleProductClick() {
   middleProduct.votes += 1;
-  voteCount += 1;
   renderProducts();
 }
 
 function handleRightProductClick() {
   rightProduct.votes += 1;
-  voteCount += 1;
   renderProducts();
 }
 
@@ -94,28 +90,47 @@ function endVoting() {
   showResultsButton.hidden = false;
   showResultsButton.addEventListener('click', handleShowResultsClick);
   const resultsHeaderElem = document.createElement('h2');
-  //showResultsSection.appendChild(resultsHeaderElem);
   resultsHeaderElem.textContent = 'Results';
-  //saveProductResults();
+  saveProductResults();
 }
 
 function removeResultsListener() {
   showResultsButton.removeEventListener('click', handleShowResultsClick);
 }
 
-// function renderResults() {
+function saveProductResults() {
+  const productStorageText = JSON.stringify(Product.allProducts);
+  localStorage.setItem(productStorageKey, productStorageText);
+}
 
-//   const ul = document.createElement('ul');
-//   showResultsSection.appendChild(ul);
+function parseStoredProducts(storageText) {
+  // restore from storage
+  const storedProductObjects = JSON.parse(storageText);
 
-//   for (let i = 0; i < Product.allProducts.length; i++) {
-//     const productInstance = Product.allProducts[i];
-//     const result = `The product ${productInstance.name} received ${productInstance.votes} votes and was viewed ${productInstance.views} times.`;
-//     const li = document.createElement('li');
-//     ul.appendChild(li);
-//     li.textContent = result;
-//   }
-// }
+  Product.allProducts.length = 0; // fail safe to reset products array to 0
+
+  for (let productObject of storedProductObjects) {
+    // console.log(productObject.views);
+    const currentProduct = new Product(
+      productObject.name,
+      productObject.src,
+      productObject.views,
+      productObject.clicks
+    );
+    Product.allProducts.push(currentProduct);
+  }
+  console.log(Product.allProducts);
+}
+
+function loadProducts() {
+  const productStorageText = localStorage.getItem(productStorageKey); // access stored product results data stored in the saveProductResults() function
+  console.log(productStorageText);
+  if (productStorageText) {
+    parseStoredProducts(productStorageText); // if there is stored results data, access it and parse it, if not, initiate products creation
+  } else {
+    initProducts();
+  }
+}
 
 // Fisher Yates via Chat GPT
 function shuffleArray(array) {
@@ -142,7 +157,7 @@ function renderChart() {
   for (let i = 0; i < Product.allProducts.length; i++) {
     let currentProduct = Product.allProducts[i];
     productNames.push(currentProduct.name);
-    productVotes.push(currentProduct.clicks);
+    productVotes.push(currentProduct.votes);
     productViews.push(currentProduct.views);
   }
 
@@ -174,10 +189,11 @@ function renderChart() {
     options: {
       scales: {
         x: {
-          stacked: true,
+          stacked: false,
         },
         y: {
-          stacked: true,
+          stacked: false,
+          beginAtZero: true,
         },
       },
     },
@@ -187,4 +203,3 @@ function renderChart() {
 }
 
 startApp();
-
